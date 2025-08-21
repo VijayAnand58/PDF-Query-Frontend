@@ -1,4 +1,4 @@
-import react from 'react'
+// import react from 'react'
 import Navbar from '@/components/Navbarcomp'
 import HeroSection from '@/components/Hero'
 import FeaturesSection from '@/components/FeaturesSection'

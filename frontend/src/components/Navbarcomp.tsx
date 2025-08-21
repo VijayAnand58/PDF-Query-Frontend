@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
+import logo from "@/assets/logo.png"
 
 export default function Navbar() {
   return (
@@ -9,7 +10,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-8">
           {/* Logo Placeholder */}
         <div className="flex justify-center">
-            <img src="/src/assets/logo.png" alt="Company Logo" className="h-12 w-auto" />
+            <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
 
           {/* Nav Links */}

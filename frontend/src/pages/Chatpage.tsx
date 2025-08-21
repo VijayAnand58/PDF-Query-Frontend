@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import logo from "@/assets/logo.png"
 
 type Message = {
   role: "user" | "assistant"
@@ -68,7 +69,7 @@ export default function ChatPage() {
       {/* Sidebar */}
       <div className="w-64 border-r bg-white p-6 space-y-6">
         <div className="flex justify-center mb-6">
-            <img src="/src/assets/logo.png" alt="Company Logo" className="h-12 w-auto" />
+            <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
         <h2 className="text-lg font-semibold">Search Options</h2>
 

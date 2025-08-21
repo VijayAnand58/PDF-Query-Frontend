@@ -15,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import logo from "@/assets/logo.png"
 
 // ----------------- Validation Schemas -----------------
 const loginSchema = z.object({
@@ -59,7 +60,7 @@ export default function SignupLoginPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
         {/* Company Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/src/assets/logo.png" alt="Company Logo" className="h-12 w-auto" />
+          <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
 
         <Tabs defaultValue="login" className="w-full">

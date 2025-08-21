@@ -4,15 +4,16 @@ import { useState } from "react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { UploadCloud } from "lucide-react"
-import { useNavigate } from "react-router-dom"
+// import { useNavigate } from "react-router-dom"
 import { Link } from "react-router-dom"
+import logo from "@/assets/logo.png"
 
 type Status = "idle" | "processing" | "processed" | "failed"
 
 export default function UploadPage() {
   const [status, setStatus] = useState<Status>("idle")
   const [progress, setProgress] = useState(0)
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -45,7 +46,7 @@ export default function UploadPage() {
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-            <img src="/src/assets/logo.png" alt="Company Logo" className="h-12 w-auto" />
+            <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
 
         {/* Upload Box */}
