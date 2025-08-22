@@ -4,42 +4,60 @@ import { useState } from "react"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { UploadCloud } from "lucide-react"
-// import { useNavigate } from "react-router-dom"
-import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
+import { useAppStore } from "@/store/useAppstore"
+// import { Link } from "react-router-dom"
 import logo from "@/assets/logo.png"
+import axios from "axios";
 
 type Status = "idle" | "processing" | "processed" | "failed"
 
 export default function UploadPage() {
   const [status, setStatus] = useState<Status>("idle")
   const [progress, setProgress] = useState(0)
-  // const navigate = useNavigate()
+  const navigate = useNavigate()
+  const setFilenames = useAppStore((state) => state.setFilenames);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+      
+      const selectedFiles = e.target.files;
+      if (!selectedFiles || selectedFiles.length === 0) return;
 
-    if (file.type !== "application/pdf") {
-      setStatus("failed")
-      return
-    }
-
-    // Start processing
-    setStatus("processing")
-    setProgress(0)
-
-    // Fake progress simulation (replace with API call)
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval)
-          setStatus("processed")
-          return 100
+      for (let i = 0; i < selectedFiles.length; i++) {
+        if (selectedFiles[i].type !== "application/pdf") {
+          // Reject non-PDFs, show error or return
+          console.error("Only PDF files are allowed");
+          setStatus("failed"); // if you want to update UI status
+          return;
         }
-        return prev + 20
-      })
-    }, 600)
-  }
+      }
+
+
+      setStatus("processing");
+      setProgress(0);
+
+      try {
+        const formData = new FormData();
+        for (let i = 0; i < selectedFiles.length; i++) {
+          formData.append("files", selectedFiles[i]); 
+        }
+
+        const res=await axios.post("http://localhost:8000/protected/upload/", formData, {
+          withCredentials: true,
+          onUploadProgress: (progressEvent) => {
+            const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+            setProgress(percent);
+          },
+        });
+        setFilenames(res.data.filenames);
+        setStatus("processed");
+
+      } catch (error) {
+        console.error("Upload error:", error);
+        setStatus("failed");
+      }
+  };
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6">
@@ -75,11 +93,9 @@ export default function UploadPage() {
               <>
                 <Progress value={100} className="w-full" />
                 <p className="text-green-600 font-medium">File processed successfully!</p>
-                <Link to="/chat">
-                <Button className="w-full mt-4">
+                <Button className="w-full mt-4" onClick={()=>navigate("/chat")}>
                   Go to Chat
                 </Button>
-                </Link>
               </>
             )}
 

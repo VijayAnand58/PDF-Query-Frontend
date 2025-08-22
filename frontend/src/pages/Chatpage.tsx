@@ -11,6 +11,10 @@ import { Switch } from "@/components/ui/switch"
 import { Checkbox } from "@/components/ui/checkbox"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import logo from "@/assets/logo.png"
+import { useAppStore } from "@/store/useAppstore"
+import axios from "axios"
+import ReactMarkdown from "react-markdown";
+import { useNavigate } from "react-router-dom"
 
 type Message = {
   role: "user" | "assistant"
@@ -26,11 +30,13 @@ const chatSchema = z.object({
 })
 
 export default function ChatPage() {
-  const pdfs = [
-    { id: "pdf1", label: "PDF 1" },
-    { id: "pdf2", label: "PDF 2" },
-    // TODO: replace with your real uploaded list
-  ]
+  const filenames = useAppStore((state) => state.filenames);
+  const navigate = useNavigate();
+  const pdfs = filenames.map((name) => ({
+      id: name,
+      label: name
+    }));
+  console.log(pdfs);
 
   const [messages, setMessages] = useState<Message[]>([])
   const [imageSearch, setImageSearch] = useState(false)
@@ -44,25 +50,64 @@ export default function ChatPage() {
     defaultValues: { message: "" },
   })
 
-  const handleSubmit = (values: z.infer<typeof chatSchema>) => {
-  const userMessage: Message = { role: "user", text: values.message }
-  setMessages((prev) => [...prev, userMessage])
+  const handleSubmit = async (values: z.infer<typeof chatSchema>) => {
+    const userMessage: Message = { role: "user", text: values.message };
+    setMessages((prev) => [...prev, userMessage]);
 
-  // Example mocked API response
-  const response: Message = {
-    role: "assistant",
-    text: `Pretend answer for "${values.message}" using mode: ${searchMode}`,
-    textMetadata: "Page 3, Document: sample.pdf",
-    imgAnswer: imageSearch ? "Here’s a related diagram" : undefined,
-    imgMetadata: imageSearch ? "diagram.png" : undefined,
-    encodedImg: imageSearch
-      ? "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA..."
-      : undefined,
-  }
+    try {
+      let endpoint = "";
+      let payload: any = {
+        query: values.message,
+        image_switch: imageSearch,
+      };
 
-  setMessages((prev) => [...prev, response])
-  form.reset()
-}
+      // Select the endpoint and payload based on searchMode
+      if (searchMode === "all") {
+        endpoint = "http://localhost:8000/protected/chat/all_pdfs/";
+      } else if (searchMode === "subset") {
+        endpoint = "http://localhost:8000/protected/chat/specific_pdfs/";
+        payload.pdf_names = subsetSelection; // selected subset PDFs
+      } else if (searchMode === "page") {
+        endpoint = "http://localhost:8000/protected/chat/one_pdf_page/";
+        payload.pdf_name = pagePdf;
+        payload.page_number = parseInt(pageNumber, 10);
+      }
+
+      const res = await axios.post(endpoint, payload, { withCredentials: true });
+
+      // Backend returns: { message: "...", result: {...} }
+      const result = res.data.result;
+
+      const assistantMessage: Message = {
+        role: "assistant",
+        text: result.text_answer,
+        textMetadata: result.text_metadata,
+        imgAnswer: result.img_answer,
+        imgMetadata: result.img_metadata,
+        encodedImg: result.encoded_img,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
+    } catch (err) {
+      console.error(err);
+      const errorMessage: Message = {
+        role: "assistant",
+        text: "There was an error retrieving the response.",
+      };
+      setMessages((prev) => [...prev, errorMessage]);
+    }
+
+    form.reset();
+  };
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8000/protected/logout/", {}, { withCredentials: true });
+
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
+  };
 
   return (
     <div className="flex h-screen">
@@ -159,7 +204,7 @@ export default function ChatPage() {
       </div>
       <div className="absolute bottom-20 flex items-center justify-between">
         <div className="flex items-center space-x-2">
-            <Button className="hover: cursor-pointer">Logout</Button>
+            <Button className="hover: cursor-pointer" onClick={handleLogout}>Logout</Button>
         </div>
       </div>
 </div>
@@ -179,23 +224,33 @@ export default function ChatPage() {
                 }`}
             >
                 {/* Text answer */}
-                {msg.text && <p>{msg.text}</p>}
-
-                {/* Text metadata */}
-                {msg.textMetadata && (
-                <p className="text-xs text-gray-500">📄 {msg.textMetadata}</p>
+                {/* {msg.text && <p>{msg.text}</p>} */}
+                {msg.text && (
+                  <ReactMarkdown>{msg.text}</ReactMarkdown>
                 )}
 
-                {/* Image answer */}
-                {msg.imgAnswer && <p>{msg.imgAnswer}</p>}
+                {/* Text metadata */}
+                {/* {msg.textMetadata && (
+                <p className="text-xs text-gray-500">📄 {msg.textMetadata}</p>
+                )} */}
 
                 {/* Encoded Image */}
-                {msg.encodedImg && (
-                <img
-                    src={msg.encodedImg}
-                    alt="AI result"
-                    className="rounded-lg max-h-48 border"
-                />
+                {msg.encodedImg && Array.isArray(msg.encodedImg) && (
+                  <div className="flex flex-wrap gap-2">
+                    {msg.encodedImg.map((imgSrc, idx) => (
+                      <img
+                        key={idx}
+                        src={imgSrc}
+                        alt={`AI result ${idx + 1}`}
+                        className="rounded-lg max-h-48 border"
+                      />
+                    ))}
+                  </div>
+                )}
+                {/* Image answer */}
+                {/* {msg.imgAnswer && <p>{msg.imgAnswer}</p>} */}
+                {msg.imgAnswer && (
+                  <ReactMarkdown>{msg.imgAnswer}</ReactMarkdown>
                 )}
 
             </div>
