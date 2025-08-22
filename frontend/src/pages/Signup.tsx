@@ -1,8 +1,8 @@
 "use client"
 
-import { z } from "zod"
+import { set, z } from "zod"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
-import { Link } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import {
   Form,
@@ -15,18 +15,22 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { StatusAlert } from "@/components/alert"
+import { useNavigate } from "react-router-dom"
 import logo from "@/assets/logo.png"
+import API from "@/lib/api"
 
 // ----------------- Validation Schemas -----------------
+
 const loginSchema = z.object({
-  email: z.string().email("Enter a valid email"),
+  email_id: z.string().email("Enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 })
 
 const signupSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Enter a valid email"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
+  email_id: z.string().email("Enter a valid email"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 })
 
@@ -35,24 +39,62 @@ type SignupFormValues = z.infer<typeof signupSchema>
 
 // ----------------- Main Component -----------------
 export default function SignupLoginPage() {
+  const [alert, setAlert] = useState<{ type: "default" | "destructive"; title: string; message: string } | null>(null)
+  const [alertVisible, setAlertVisible] = useState(false);
+  const navigate = useNavigate()
+
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { email_id: "", password: "" },
   })
 
   const signupForm = useForm<SignupFormValues>({
     resolver: zodResolver(signupSchema),
-    defaultValues: { firstName: "", lastName: "", email: "", password: "" },
+    defaultValues: { first_name: "", last_name: "", email_id: "", password: "" },
   })
 
-  const handleLogin = (values: LoginFormValues) => {
-    console.log("Login:", values)
-    // TODO: integrate with backend
+  const handleLogin = async(values: LoginFormValues) => {
+    console.log("Login values:", values)
+    try {
+    const res = await API.post("/login", values)
+    console.log("Login successful:", res.data)
+    setAlert({ type: "default", title: "Success", message: "Login successful! Redirecting..." })
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+      navigate("/upload")
+    }, 5000) // go to upload page after login
+  } catch (err: any) {
+    console.error("Login error:", err.response?.data || err.message)
+    setAlert({ type: "destructive", title: "Error", message: err.response?.data || "Login failed" }) 
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+      navigate("/")
+    }, 5000)
+  }
   }
 
-  const handleSignup = (values: SignupFormValues) => {
-    console.log("Signup:", values)
-    // TODO: integrate with backend
+  const handleSignup = async(values: SignupFormValues) => {
+    console.log("Signup values:", values)
+    try {
+    const res = await API.post("/register/user", values)
+    console.log("Signup successful:", res.data)
+    setAlert({ type: "default", title: "Success", message: "Signup successful! Redirecting..." })
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+      navigate("/")
+    }, 2000); // maybe redirect straight after signup
+  } catch (err: any) {
+    console.error("Signup error:", err.response?.data || err.message)
+    setAlert({ type: "destructive", title: "Error", message: err.response?.data || "Signup failed" })
+    setAlertVisible(true);
+    setTimeout(() => {
+      setAlertVisible(false);
+      navigate("/")
+    }, 2000) // go to home page after signup
+  }
   }
 
   return (
@@ -62,6 +104,10 @@ export default function SignupLoginPage() {
         <div className="flex justify-center mb-6">
           <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
+        {/* Alert Message */}
+        {alertVisible && alert && (
+          StatusAlert({ type: alert.type, title: alert.title, message: alert.message })
+        )}
 
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -75,7 +121,7 @@ export default function SignupLoginPage() {
               <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
                 <FormField
                   control={loginForm.control}
-                  name="email"
+                  name="email_id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>
@@ -99,10 +145,7 @@ export default function SignupLoginPage() {
                     </FormItem>
                   )}
                 />
-                {/* testing for now  */}
-                <Link  to="/upload">
                 <Button type="submit" className="w-full">Login</Button>
-                </Link>
               </form>
             </Form>
           </TabsContent>
@@ -113,7 +156,7 @@ export default function SignupLoginPage() {
               <form onSubmit={signupForm.handleSubmit(handleSignup)} className="space-y-4">
                 <FormField
                   control={signupForm.control}
-                  name="firstName"
+                  name="first_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>First Name</FormLabel>
@@ -126,7 +169,7 @@ export default function SignupLoginPage() {
                 />
                 <FormField
                   control={signupForm.control}
-                  name="lastName"
+                  name="last_name"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Last Name</FormLabel>
@@ -139,7 +182,7 @@ export default function SignupLoginPage() {
                 />
                 <FormField
                   control={signupForm.control}
-                  name="email"
+                  name="email_id"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email</FormLabel>

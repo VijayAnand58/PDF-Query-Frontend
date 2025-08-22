@@ -3,6 +3,7 @@ import Home from "./pages/Home"
 import SignupLoginPage from "./pages/Signup"
 import UploadPage from "./pages/PDFUpload"
 import ChatPage from "./pages/Chatpage"
+import LearnMorePage from "./pages/Learnmore"
 
 export default function App() {
   return (
@@ -12,6 +13,7 @@ export default function App() {
             <Route path="/auth" element={<SignupLoginPage />} />
             <Route path="/upload" element={<UploadPage />} />
             <Route path="/chat" element={<ChatPage />} />
+            <Route path="/learnmore" element={<LearnMorePage />} />
           </Routes>
     </Router>
   )

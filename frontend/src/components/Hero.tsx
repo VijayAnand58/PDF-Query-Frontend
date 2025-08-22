@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button"
-
+import { Link } from "react-router-dom"
 export default function HeroSection() {
   return (
     <section className="w-full bg-gray-50 py-20">
@@ -18,8 +18,12 @@ export default function HeroSection() {
 
         {/* Call to action buttons */}
         <div className="mt-8 flex flex-col sm:flex-row gap-4">
+          <Link to="/auth">
           <Button size="lg">Get Started</Button>
+          </Link>
+          <Link to="/learnmore">
           <Button size="lg" variant="outline">Learn More</Button>
+          </Link>
         </div>
 
         {/* Optional Hero Image / Illustration */}

@@ -157,6 +157,11 @@ export default function ChatPage() {
             onCheckedChange={(val) => setImageSearch(Boolean(val))}
           />
       </div>
+      <div className="absolute bottom-20 flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+            <Button className="hover: cursor-pointer">Logout</Button>
+        </div>
+      </div>
 </div>
 
       {/* Chat Area */}
@@ -213,7 +218,7 @@ export default function ChatPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit">Send</Button>
+              <Button type="submit" className="hover:cursor-pointer">Send</Button>
             </form>
           </Form>
         </div>

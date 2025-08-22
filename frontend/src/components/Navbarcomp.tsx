@@ -9,18 +9,20 @@ export default function Navbar() {
         {/* Left side: Logo + Links */}
         <div className="flex items-center space-x-8">
           {/* Logo Placeholder */}
-        <div className="flex justify-center">
-            <img src={logo} alt="Company Logo" className="h-12 w-auto" />
-        </div>
+          <Link to="/">
+          <div className="flex justify-center">
+              <img src={logo} alt="Company Logo" className="h-12 w-auto" />
+          </div>
+          </Link>
 
           {/* Nav Links */}
           <div className="hidden md:flex items-center space-x-6">
-            <a href="/" className="text-sm font-medium text-gray-700 hover:text-primary">
+            <Link to="/" className="text-sm font-medium text-gray-700 hover:text-primary">
               Home
-            </a>
-            <a href="/about" className="text-sm font-medium text-gray-700 hover:text-primary">
+            </Link>
+            <Link to="/about" className="text-sm font-medium text-gray-700 hover:text-primary">
               About Us
-            </a>
+            </Link>
           </div>
         </div>
 
