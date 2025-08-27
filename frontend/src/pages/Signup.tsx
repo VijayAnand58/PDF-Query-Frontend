@@ -66,7 +66,7 @@ export default function SignupLoginPage() {
     }, 5000) // go to upload page after login
   } catch (err: any) {
     console.error("Login error:", err.response?.data || err.message)
-    setAlert({ type: "destructive", title: "Error", message: err.response?.data || "Login failed" }) 
+    setAlert({ type: "destructive", title: "Error", message: "Login failed" }) 
     setAlertVisible(true);
     setTimeout(() => {
       setAlertVisible(false);
@@ -88,7 +88,7 @@ export default function SignupLoginPage() {
     }, 2000); // maybe redirect straight after signup
   } catch (err: any) {
     console.error("Signup error:", err.response?.data || err.message)
-    setAlert({ type: "destructive", title: "Error", message: err.response?.data || "Signup failed" })
+    setAlert({ type: "destructive", title: "Error", message: "Signup failed" })
     setAlertVisible(true);
     setTimeout(() => {
       setAlertVisible(false);

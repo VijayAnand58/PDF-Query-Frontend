@@ -42,7 +42,7 @@ export default function UploadPage() {
           formData.append("files", selectedFiles[i]); 
         }
 
-        const res=await axios.post("http://localhost:8000/protected/upload/", formData, {
+        const res=await axios.post("https://pdf-quey.azurewebsites.net/protected/upload/", formData, {
           withCredentials: true,
           onUploadProgress: (progressEvent) => {
             const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));

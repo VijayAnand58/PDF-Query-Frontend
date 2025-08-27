@@ -63,12 +63,12 @@ export default function ChatPage() {
 
       // Select the endpoint and payload based on searchMode
       if (searchMode === "all") {
-        endpoint = "http://localhost:8000/protected/chat/all_pdfs/";
+        endpoint = "https://pdf-quey.azurewebsites.net/protected/chat/all_pdfs/";
       } else if (searchMode === "subset") {
-        endpoint = "http://localhost:8000/protected/chat/specific_pdfs/";
+        endpoint = "https://pdf-quey.azurewebsites.net/protected/chat/specific_pdfs/";
         payload.pdf_names = subsetSelection; // selected subset PDFs
       } else if (searchMode === "page") {
-        endpoint = "http://localhost:8000/protected/chat/one_pdf_page/";
+        endpoint = "https://pdf-quey.azurewebsites.net/protected/chat/one_pdf_page/";
         payload.pdf_name = pagePdf;
         payload.page_number = parseInt(pageNumber, 10);
       }
@@ -101,7 +101,7 @@ export default function ChatPage() {
   };
   const handleLogout = async () => {
     try {
-      await axios.post("http://localhost:8000/protected/logout/", {}, { withCredentials: true });
+      await axios.post("https://pdf-quey.azurewebsites.net/protected/logout/", {}, { withCredentials: true });
 
       navigate("/");
     } catch (err) {
