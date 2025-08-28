@@ -31,6 +31,13 @@ export default function UploadPage() {
           return;
         }
       }
+      // Check total size (10 MB = 10 * 1024 * 1024 bytes)
+      const totalSize = Array.from(selectedFiles).reduce((acc, file) => acc + file.size, 0);
+      if (totalSize > 10 * 1024 * 1024) {
+          console.error("Total file size must be less than 10 MB");
+          setStatus("failed");
+          return;
+        }
 
 
       setStatus("processing");
