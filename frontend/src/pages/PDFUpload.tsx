@@ -86,6 +86,7 @@ export default function UploadPage() {
           <input
             type="file"
             accept="application/pdf"
+            multiple
             className="hidden"
             onChange={handleFileUpload}
           />
