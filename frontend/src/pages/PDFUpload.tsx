@@ -1,77 +1,82 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { UploadCloud } from "lucide-react"
-import { useNavigate } from "react-router-dom"
-import { useAppStore } from "@/store/useAppstore"
+import { useState } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { UploadCloud } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { useAppStore } from "@/store/useAppstore";
 // import { Link } from "react-router-dom"
-import logo from "@/assets/logo.png"
+import logo from "@/assets/logo.png";
 import axios from "axios";
 
-type Status = "idle" | "processing" | "processed" | "failed"
+type Status = "idle" | "processing" | "processed" | "failed";
 
 export default function UploadPage() {
-  const [status, setStatus] = useState<Status>("idle")
-  const [progress, setProgress] = useState(0)
-  const navigate = useNavigate()
+  const [status, setStatus] = useState<Status>("idle");
+  const [progress, setProgress] = useState(0);
+  const navigate = useNavigate();
   const setFilenames = useAppStore((state) => state.setFilenames);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-      
-      const selectedFiles = e.target.files;
-      if (!selectedFiles || selectedFiles.length === 0) return;
+    const selectedFiles = e.target.files;
+    if (!selectedFiles || selectedFiles.length === 0) return;
 
-      for (let i = 0; i < selectedFiles.length; i++) {
-        if (selectedFiles[i].type !== "application/pdf") {
-          // Reject non-PDFs, show error or return
-          console.error("Only PDF files are allowed");
-          setStatus("failed"); // if you want to update UI status
-          return;
-        }
+    for (let i = 0; i < selectedFiles.length; i++) {
+      if (selectedFiles[i].type !== "application/pdf") {
+        // Reject non-PDFs, show error or return
+        console.error("Only PDF files are allowed");
+        setStatus("failed"); // if you want to update UI status
+        return;
       }
-      // Check total size (10 MB = 10 * 1024 * 1024 bytes)
-      const totalSize = Array.from(selectedFiles).reduce((acc, file) => acc + file.size, 0);
-      if (totalSize > 10 * 1024 * 1024) {
-          console.error("Total file size must be less than 10 MB");
-          setStatus("failed");
-          return;
-        }
+    }
+    // Check total size (10 MB = 10 * 1024 * 1024 bytes)
+    const totalSize = Array.from(selectedFiles).reduce(
+      (acc, file) => acc + file.size,
+      0
+    );
+    if (totalSize > 10 * 1024 * 1024) {
+      console.error("Total file size must be less than 10 MB");
+      setStatus("failed");
+      return;
+    }
 
+    setStatus("processing");
+    setProgress(0);
 
-      setStatus("processing");
-      setProgress(0);
+    try {
+      const formData = new FormData();
+      for (let i = 0; i < selectedFiles.length; i++) {
+        formData.append("files", selectedFiles[i]);
+      }
 
-      try {
-        const formData = new FormData();
-        for (let i = 0; i < selectedFiles.length; i++) {
-          formData.append("files", selectedFiles[i]); 
-        }
-
-        const res=await axios.post("https://pdf-quey.azurewebsites.net/protected/upload/", formData, {
+      const res = await axios.post(
+        "https://pdf-quey.azurewebsites.net/protected/upload/",
+        formData,
+        {
           withCredentials: true,
           onUploadProgress: (progressEvent) => {
-            const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1));
+            const percent = Math.round(
+              (progressEvent.loaded * 100) / (progressEvent.total || 1)
+            );
             setProgress(percent);
           },
-        });
-        setFilenames(res.data.filenames);
-        setStatus("processed");
-
-      } catch (error) {
-        console.error("Upload error:", error);
-        setStatus("failed");
-      }
+        }
+      );
+      setFilenames(res.data.filenames);
+      setStatus("processed");
+    } catch (error) {
+      console.error("Upload error:", error);
+      setStatus("failed");
+    }
   };
-
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-6">
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg p-8 text-center">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-            <img src={logo} alt="Company Logo" className="h-12 w-auto" />
+          <img src={logo} alt="Company Logo" className="h-12 w-auto" />
         </div>
 
         {/* Upload Box */}
@@ -99,19 +104,26 @@ export default function UploadPage() {
             {status === "processed" && (
               <>
                 <Progress value={100} className="w-full" />
-                <p className="text-green-600 font-medium">File processed successfully!</p>
-                <Button className="w-full mt-4" onClick={()=>navigate("/chat")}>
+                <p className="text-green-600 font-medium">
+                  File processed successfully!
+                </p>
+                <Button
+                  className="w-full mt-4"
+                  onClick={() => navigate("/chat")}
+                >
                   Go to Chat
                 </Button>
               </>
             )}
 
             {status === "failed" && (
-              <p className="text-red-600 font-medium">Upload failed. Only PDF files are allowed.</p>
+              <p className="text-red-600 font-medium">
+                Upload failed. Only PDF files are allowed.
+              </p>
             )}
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }

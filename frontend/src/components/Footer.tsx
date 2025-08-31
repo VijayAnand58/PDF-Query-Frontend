@@ -7,7 +7,7 @@ export default function Footer() {
         
         {/* Left - GitHub Logo */}
         <a
-          href="https://google.com/"
+          href="https://github.com/VijayAnand58/PDF-query"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-2 hover:text-blue-800 transition"
