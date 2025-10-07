@@ -179,7 +179,7 @@ export default function ChatPage() {
 
         {/* All PDFs */}
         <div className="flex items-center justify-between">
-          <span>All PDFs</span>
+          <span>All Files</span>
           <Switch
             checked={searchMode === "all"}
             onCheckedChange={() => setSearchMode("all")}
@@ -303,7 +303,7 @@ export default function ChatPage() {
 
             {/* All PDFs */}
             <div className="flex items-center justify-between">
-              <span>All PDFs</span>
+              <span>All Files</span>
               <Switch
                 checked={searchMode === "all"}
                 onCheckedChange={() => setSearchMode("all")}
@@ -359,12 +359,17 @@ export default function ChatPage() {
 
               {searchMode === "page" && (
                 <div className="ml-2 space-y-3">
+                  <p className="text-sm text-gray-500">
+                  This feature is only for PDF files.
+                  </p>
                   <RadioGroup
                     value={pagePdf}
                     onValueChange={setPagePdf}
                     className="space-y-2"
                   >
-                    {pdfs.map((p) => (
+                    {pdfs
+                    .filter((p) => p.label.toLowerCase().endsWith(".pdf"))
+                    .map((p) => (
                       <div className="flex items-center space-x-2" key={p.id}>
                         <RadioGroupItem value={p.id} id={`radio-${p.id}`} />
                         <label htmlFor={`radio-${p.id}`} className="text-sm">
