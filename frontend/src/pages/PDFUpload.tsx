@@ -12,6 +12,18 @@ import axios from "axios";
 
 type Status = "idle" | "processing" | "processed" | "failed";
 
+// Allowed MIME types
+const allowedTypes = [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+    "audio/mpeg",  // .mp3
+    "audio/wav",   // .wav
+    "audio/x-wav", // sometimes used for .wav
+    "audio/mp4",   // .m4a may sometimes use this
+    "audio/x-m4a",
+    "audio/aac",
+  ];
+
 export default function UploadPage() {
   const [status, setStatus] = useState<Status>("idle");
   const [progress, setProgress] = useState(0);
@@ -23,20 +35,21 @@ export default function UploadPage() {
     if (!selectedFiles || selectedFiles.length === 0) return;
 
     for (let i = 0; i < selectedFiles.length; i++) {
-      if (selectedFiles[i].type !== "application/pdf") {
-        // Reject non-PDFs, show error or return
-        console.error("Only PDF files are allowed");
-        setStatus("failed"); // if you want to update UI status
+      // allow only specific file types
+      const file = selectedFiles[i];
+      if (!allowedTypes.includes(file.type)) {  
+        console.error(`Unsupported file type: ${file.name} (${file.type})`);
+        setStatus("failed"); // update your UI if needed
         return;
-      }
     }
+  }
     // Check total size (10 MB = 10 * 1024 * 1024 bytes)
     const totalSize = Array.from(selectedFiles).reduce(
       (acc, file) => acc + file.size,
       0
     );
-    if (totalSize > 10 * 1024 * 1024) {
-      console.error("Total file size must be less than 10 MB");
+    if (totalSize > 20 * 1024 * 1024) {
+      console.error("Total file size must be less than 20 MB");
       setStatus("failed");
       return;
     }
@@ -82,15 +95,19 @@ export default function UploadPage() {
         {/* Upload Box */}
         <label className="flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-xl py-16 cursor-pointer hover:border-primary transition">
           <UploadCloud className="h-12 w-12 text-gray-500 mb-4" />
-          <p className="text-gray-600">Click to upload a PDF file</p>
-          <input
-            type="file"
-            accept="application/pdf"
-            multiple
-            className="hidden"
-            onChange={handleFileUpload}
-          />
+            <p className="text-gray-600 text-center">
+              Click to upload a file <br />
+              <span className="text-sm text-gray-500">(PDF, DOCX, MP3, WAV, M4A, AAC)</span>
+            </p>
+            <input
+              type="file"
+              accept=".pdf,.docx,.mp3,.wav,.m4a,.aac"
+              multiple
+              className="hidden"
+              onChange={handleFileUpload}
+            />
         </label>
+
 
         {/* Status Bar */}
         {status !== "idle" && (
@@ -119,7 +136,8 @@ export default function UploadPage() {
 
             {status === "failed" && (
               <p className="text-red-600 font-medium">
-                Upload failed. Only PDF files are allowed.
+                Upload failed. Please try again.
+                Probable reasons: Unsupported file type or total size exceeds 20 MB.
               </p>
             )}
           </div>

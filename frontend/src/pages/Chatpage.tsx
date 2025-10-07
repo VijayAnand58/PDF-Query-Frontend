@@ -15,7 +15,7 @@ import { useAppStore } from "@/store/useAppstore";
 import axios from "axios";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Mic } from "lucide-react";
 
 type Message = {
   role: "user" | "assistant";
@@ -48,6 +48,52 @@ export default function ChatPage() {
   const [pagePdf, setPagePdf] = useState<string>(pdfs[0]?.id ?? "");
   const [pageNumber, setPageNumber] = useState<string>("");
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Speech Recognition (only for Chromium browsers)
+  const [isListening, setIsListening] = useState(false);
+  
+  // @ts-ignore
+  const recognitionRef = useState<SpeechRecognition | null>(null);
+  // this is to bypass the "speechrecognition not found" error as they are a part of webkit and not typescript
+
+  const isChromium =
+    typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
+
+  const startListening = () => {
+    if (!isChromium) return alert("Voice input is supported only in Chromium browsers.");
+
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    // @ts-ignore
+    recognition.onresult = (event: SpeechRecognitionEvent) => {
+      let transcript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        transcript += event.results[i][0].transcript;
+      }
+      // Set recognized speech to the input field
+      form.setValue("message", transcript);
+    };
+
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+
+    recognition.start();
+    recognitionRef[1](recognition);
+    setIsListening(true);
+  };
+
+  const stopListening = () => {
+    recognitionRef[0]?.stop();
+    setIsListening(false);
+  };
+
 
   const form = useForm<z.infer<typeof chatSchema>>({
     resolver: zodResolver(chatSchema),
@@ -189,12 +235,17 @@ export default function ChatPage() {
 
           {searchMode === "page" && (
             <div className="ml-2 space-y-3">
+              <p className="text-sm text-gray-500">
+              This feature is only for PDF files.
+              </p>
               <RadioGroup
                 value={pagePdf}
                 onValueChange={setPagePdf}
                 className="space-y-2"
               >
-                {pdfs.map((p) => (
+                {pdfs
+                .filter((p) => p.label.toLowerCase().endsWith(".pdf"))
+                .map((p) => (
                   <div className="flex items-center space-x-2" key={p.id}>
                     <RadioGroupItem value={p.id} id={`radio-${p.id}`} />
                     <label htmlFor={`radio-${p.id}`} className="text-sm">
@@ -427,7 +478,25 @@ export default function ChatPage() {
                 render={({ field }) => (
                   <FormItem className="flex-1">
                     <FormControl>
-                      <Input placeholder="Ask something..." {...field} />
+                      <div className="relative flex items-center">
+                        {isChromium && (
+                          <button
+                            type="button"
+                            onClick={isListening ? stopListening : startListening}
+                            className={`absolute left-3 p-1 rounded-full transition ${
+                              isListening ? "bg-red-100 text-red-500" : "text-gray-400 hover:text-gray-600"
+                            }`}
+                            title="Voice Input"
+                          >
+                            <Mic className="h-4 w-4" />
+                          </button>
+                        )}
+                        <Input
+                          placeholder="Ask something..."
+                          className="pl-10" // padding-left so text doesn't overlap mic
+                          {...field}
+                        />
+                      </div>
                     </FormControl>
                   </FormItem>
                 )}

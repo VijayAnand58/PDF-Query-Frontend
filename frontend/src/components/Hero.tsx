@@ -7,7 +7,7 @@ export default function HeroSection() {
         
         {/* Heading */}
         <h1 className="text-4xl font-extrabold tracking-tight text-gray-900 md:text-6xl">
-          Talk with Your PDFs <span className="text-primary">Smarter</span>
+          Talk with Your Files <span className="text-primary">Smarter</span>
         </h1>
 
         {/* Subtext */}
