@@ -71,12 +71,12 @@ export default function Navbar() {
           >
             Home
           </Link>
-          <Link
+          {/* <Link
             to="/about"
             className="text-sm font-medium text-gray-700 hover:text-primary"
           >
             About Us
-          </Link>
+          </Link> */}
           <Link to="/auth">
             <Button variant="ghost" className="w-full">
               Login

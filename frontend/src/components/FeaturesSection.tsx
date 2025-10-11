@@ -13,8 +13,8 @@ const features = [
     icon: FileText,
   },
   {
-    title: "Multiple PDF Uploads",
-    description: "Upload and manage multiple PDFs in one place seamlessly.",
+    title: "Multiple Files Upload",
+    description: "Upload and manage multiple Files in one place seamlessly.",
     icon: Layers,
   },
   {

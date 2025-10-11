@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import logo from "@/assets/logo.png";
 import { useAppStore } from "@/store/useAppstore";
-import axios from "axios";
+import API from "@/lib/api";
 import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 import { Menu, X, Mic } from "lucide-react";
@@ -114,19 +114,19 @@ export default function ChatPage() {
       // Select the endpoint and payload based on searchMode
       if (searchMode === "all") {
         endpoint =
-          "https://pdf-quey.azurewebsites.net/protected/chat/all_pdfs/";
+          "/protected/chat/all_pdfs/";
       } else if (searchMode === "subset") {
         endpoint =
-          "https://pdf-quey.azurewebsites.net/protected/chat/specific_pdfs/";
+          "/protected/chat/specific_pdfs/";
         payload.pdf_names = subsetSelection; // selected subset PDFs
       } else if (searchMode === "page") {
         endpoint =
-          "https://pdf-quey.azurewebsites.net/protected/chat/one_pdf_page/";
+          "/protected/chat/one_pdf_page/";
         payload.pdf_name = pagePdf;
         payload.page_number = parseInt(pageNumber, 10);
       }
 
-      const res = await axios.post(endpoint, payload, {
+      const res = await API.post(endpoint, payload, {
         withCredentials: true,
       });
 
@@ -156,8 +156,8 @@ export default function ChatPage() {
   };
   const handleLogout = async () => {
     try {
-      await axios.post(
-        "https://pdf-quey.azurewebsites.net/protected/logout/",
+      await API.post(
+        "/protected/logout/",
         {},
         { withCredentials: true }
       );

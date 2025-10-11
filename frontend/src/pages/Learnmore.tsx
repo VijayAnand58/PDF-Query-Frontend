@@ -15,13 +15,13 @@ import Footer from "@/components/Footer";
 export default function LearnMorePage() {
   const steps = [
     {
-      title: "Upload PDFs",
-      description: "Users upload multiple PDFs that need to be processed.",
+      title: "Upload Files",
+      description: "Users upload multiple Files that need to be processed.",
     },
     {
       title: "Parsing",
       description:
-        "Text & images are extracted using PyMuPDF for downstream processing.",
+        "Text & images are extracted for downstream processing.",
     },
     {
       title: "Embedding",
@@ -61,7 +61,7 @@ export default function LearnMorePage() {
             <img
               src={architectureImage}
               alt="Architecture Diagram"
-              className="rounded-xl shadow-md max-h-[400px] object-contain"
+              className="rounded-xl shadow-md  object-contain"
             />
           </Card>
 

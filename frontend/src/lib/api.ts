@@ -1,7 +1,8 @@
 import axios from "axios"
+import { PDF_BASE_URL } from "../config"; 
 
 const API = axios.create({
-  baseURL: "https://pdf-quey.azurewebsites.net",
+  baseURL: PDF_BASE_URL,
   withCredentials: true,         
 })
 

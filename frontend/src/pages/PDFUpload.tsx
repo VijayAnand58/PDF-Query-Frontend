@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { useAppStore } from "@/store/useAppstore";
 // import { Link } from "react-router-dom"
 import logo from "@/assets/logo.png";
-import axios from "axios";
+import API from "@/lib/api";
 
 type Status = "idle" | "processing" | "processed" | "failed";
 
@@ -63,8 +63,8 @@ export default function UploadPage() {
         formData.append("files", selectedFiles[i]);
       }
 
-      const res = await axios.post(
-        "https://pdf-quey.azurewebsites.net/protected/upload/",
+      const res = await API.post(
+        "/protected/upload/",
         formData,
         {
           withCredentials: true,
