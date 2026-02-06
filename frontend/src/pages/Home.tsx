@@ -11,12 +11,6 @@ export default function Home() {
       <HeroSection />
       <FeaturesSection />
       <Footer />
-
-      {/* Add more sections as needed */}
-      {/* Footer can be added here if needed */}
-      {/* Add more sections as needed */}
-      {/* Footer can be added here if needed */}
-      {/* Add more sections as needed */}
     </div>
   );
 }

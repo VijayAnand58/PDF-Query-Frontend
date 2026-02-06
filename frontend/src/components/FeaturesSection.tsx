@@ -9,7 +9,7 @@ const features = [
   },
   {
     title: "Context-Only Responses",
-    description: "Answers are generated only from the provided files — nothing made up.",
+    description: "Answers are generated only from the provided files, nothing made up.",
     icon: FileText,
   },
   {
@@ -24,12 +24,12 @@ const features = [
   },
   {
     title: "Flexible Chat Modes",
-    description: "Choose to chat with all PDFs, a subset, or even a single page.",
+    description: "Choose to chat with all Files, a subset, or even a single page.",
     icon: Shield,
   },
   {
     title: "Privacy Focused",
-    description: "All your files are deleted securely after logout — your data stays yours.",
+    description: "All your files are deleted securely after logout your data stays yours.",
     icon: Lock,
   },
 ]
@@ -43,7 +43,7 @@ export default function FeaturesSection() {
           Powerful Features
         </h2>
         <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-          Everything you need to unlock knowledge from your documents — fast, reliable, and private.
+          Everything you need to unlock knowledge from your documents  fast, reliable, and private.
         </p>
 
         {/* Feature Cards Grid */}
